@@ -50,21 +50,13 @@ int main() {
         NDI_video_frame.line_stride_in_bytes = resized_frame.step[0];
 
 
-//	std::cout << "First byte of frame data: " << (int)resized_frame.data[0] << std::endl;
+	std::cout << "First byte of frame data: " << (int)resized_frame.data[0] << std::endl;
 
 
-//        NDIlib_send_send_video_v2(pNDI_send, &NDI_video_frame);
-
-//	std::cout << "Sending frame: " << resized_frame.cols << "x" << resized_frame.rows << std::endl;
-
-	cv::Mat blue_frame(720, 1280, CV_8UC4, cv::Scalar(255, 0, 0, 255));  // Blue color, opaque alpha
-        NDI_video_frame.p_data = blue_frame.data;
-        NDI_video_frame.xres = blue_frame.cols;
-        NDI_video_frame.yres = blue_frame.rows;
-        NDI_video_frame.FourCC = NDIlib_FourCC_type_BGRA;
         NDIlib_send_send_video_v2(pNDI_send, &NDI_video_frame);
 
-	cv::waitKey(30);  // Adjust the delay as needed
+	std::cout << "Sending frame: " << resized_frame.cols << "x" << resized_frame.rows << std::endl;
+
     }
 
     // Clean up

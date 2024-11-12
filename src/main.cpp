@@ -12,7 +12,7 @@ int main() {
 
     // Setup NDI send settings
     NDIlib_send_create_t NDI_send_create_desc;
-    NDI_send_create_desc.p_ndi_name = "Raspberry Pi Camera Stream";
+    NDI_send_create_desc.p_ndi_name = "Raspi HX";
     NDIlib_send_instance_t pNDI_send = NDIlib_send_create(&NDI_send_create_desc);
 
     if (!pNDI_send) {
@@ -47,6 +47,9 @@ int main() {
         NDI_video_frame.yres = resized_frame.rows;
         NDI_video_frame.FourCC = NDIlib_FourCC_type_BGRA;
         NDI_video_frame.p_data = resized_frame.data;
+	NDI_video_frame.frame_rate_N = 30;  // Frame rate (use your desired FPS)
+        NDI_video_frame.frame_rate_D = 1;
+	NDI_video_frame.timecode = 0;
         NDI_video_frame.line_stride_in_bytes = resized_frame.step[0];
 
 

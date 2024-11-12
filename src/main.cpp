@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <Processing.NDI.Lib.h>
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -20,25 +21,50 @@ int main() {
     }
 
     // Open the camera
-    cv::VideoCapture cap("/dev/video0");
+    cv::VideoCapture cap("/dev/video0", cv::CAP_V4L2);
     if (!cap.isOpened()) {
         std::cerr << "Error opening video stream" << std::endl;
         return -1;
     }
 
+    int target_width = 1280;
+    int target_height = 720;
+
     cv::Mat frame;
     while (cap.read(frame)) {
-        // Encode frame to H.264 or handle as required
+        // Resize the frame
+        cv::Mat resized_frame;
+        cv::resize(frame, resized_frame, cv::Size(target_width, target_height));
 
-        // Send over NDI
+        // Convert to BGRX format for NDI if needed
+        cv::cvtColor(resized_frame, resized_frame, cv::COLOR_BGR2BGRA);
+
+//	cv::imwrite("debug_frame.png", resized_frame);
+
+        // Update the NDI frame struct with the new dimensions
         NDIlib_video_frame_v2_t NDI_video_frame;
-        NDI_video_frame.xres = frame.cols;
-        NDI_video_frame.yres = frame.rows;
-        NDI_video_frame.FourCC = NDIlib_FourCC_type_BGRX;
-        NDI_video_frame.p_data = frame.data;
-        NDI_video_frame.line_stride_in_bytes = frame.step;
+        NDI_video_frame.xres = resized_frame.cols;
+        NDI_video_frame.yres = resized_frame.rows;
+        NDI_video_frame.FourCC = NDIlib_FourCC_type_BGRA;
+        NDI_video_frame.p_data = resized_frame.data;
+        NDI_video_frame.line_stride_in_bytes = resized_frame.step[0];
 
+
+//	std::cout << "First byte of frame data: " << (int)resized_frame.data[0] << std::endl;
+
+
+//        NDIlib_send_send_video_v2(pNDI_send, &NDI_video_frame);
+
+//	std::cout << "Sending frame: " << resized_frame.cols << "x" << resized_frame.rows << std::endl;
+
+	cv::Mat blue_frame(720, 1280, CV_8UC4, cv::Scalar(255, 0, 0, 255));  // Blue color, opaque alpha
+        NDI_video_frame.p_data = blue_frame.data;
+        NDI_video_frame.xres = blue_frame.cols;
+        NDI_video_frame.yres = blue_frame.rows;
+        NDI_video_frame.FourCC = NDIlib_FourCC_type_BGRA;
         NDIlib_send_send_video_v2(pNDI_send, &NDI_video_frame);
+
+	cv::waitKey(30);  // Adjust the delay as needed
     }
 
     // Clean up

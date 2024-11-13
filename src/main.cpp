@@ -87,6 +87,8 @@ int main(int argc, char* argv[]) {
             break;
         }
 
+        cv::imwrite("new_debug_frame.png", frame);
+
         // Prepare frame for sending
         setup_frame(frame, frame_num, send_data[send_frame]);
         NDIlib_video_frame_v2_t& ndi_frame = send_data[send_frame].frame;
@@ -95,7 +97,7 @@ int main(int argc, char* argv[]) {
         // Send asynchronously
         NDIlib_send_send_video_scatter_async(pNDI_send, &ndi_frame, &scatter);
 
-	std::cout << "First byte of frame data: " << (int)frame.data[0] << std::endl;
+	    std::cout << "First byte of frame data: " << (int)frame.data[0] << std::endl;
         std::cout << "Sending frame: " << frame.cols << "x" << frame.rows << std::endl;
 
         // Alternate between buffers

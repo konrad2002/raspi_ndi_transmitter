@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
     // Set up NDI sender
     NDIlib_send_create_t NDI_send_description;
-    NDI_send_description.p_ndi_name = "Video Stream from /dev/video0";
+    NDI_send_description.p_ndi_name = "Raspi Video HX";
     NDI_send_description.clock_video = true;
     NDI_send_description.clock_audio = true;
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     if (!pNDI_send) return 0;
 
     // Open video capture on /dev/video0
-    cv::VideoCapture cap("/dev/video1", cv::CAP_V4L2);
+    cv::VideoCapture cap("/dev/video0", cv::CAP_V4L2);
     if (!cap.isOpened()) {
         fprintf(stderr, "Error: Unable to open video capture from /dev/video0\n");
         return -1;
@@ -94,6 +94,9 @@ int main(int argc, char* argv[]) {
 
         // Send asynchronously
         NDIlib_send_send_video_scatter_async(pNDI_send, &ndi_frame, &scatter);
+
+	std::cout << "First byte of frame data: " << (int)frame.data[0] << std::endl;
+        std::cout << "Sending frame: " << frame.cols << "x" << frame.rows << std::endl;
 
         // Alternate between buffers
         send_frame = (send_frame + 1) % num_frames;
